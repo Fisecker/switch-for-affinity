@@ -1,0 +1,20 @@
+{
+ "note": "Werkzeugleisten wie Adobe. Jede Zeile = ein Knopf; mehrere Werkzeuge = Flyout-Gruppe. FourCC wie in Affinity.",
+ "columns": 2,
+ "studios": {
+  "E9159E4D-661F-4138-A995-81A178A1824C": {"name": "Layout / InDesign", "groups": [
+    ["sele"], ["node","corn"], ["fram"," art"], ["tabl"], [" pen","cont"], ["penc","VBru"], ["strk"],
+    ["PiFR","PiFE"], ["rect","elli","rrec"," tri","diam","trap","poly","star","dStr","sStr","arro","donu"," pie","segm","cres"," cog","clud","calR","calE","tear","hear","spir","QRCd"," cat"],
+    ["knif"], ["plIm","data"], ["crop"], ["fill","tran"], ["pick","drop"], ["meas","area"], ["----"], ["view"], ["zoom"]]},
+  "7C4CC2E1-D695-422B-AD3B-326C60971BE7": {"name": "Vektor / Illustrator", "groups": [
+    ["sele"], ["node","form"], ["artB"], [" pen","corn"], ["cont"], [" art","fram"], ["strk"],
+    ["rect","elli","rrec"," tri","diam","trap","poly","star","dStr","sStr","arro","donu"," pie","segm","cres"," cog","clud","calR","calE","tear","hear","spir","QRCd"," cat"],
+    ["VBru","penc"], ["knif"], ["buil"], ["blnd"], ["vFil"], ["fill","tran"], ["pick","drop"], ["meas","area"], ["plIm"], ["crop"], ["----"], ["view"], ["zoom"], ["----"]]},
+  "831AAB2C-659F-4906-A8B1-8BA4544DB274": {"name": "Pixel / Photoshop", "groups": [
+    ["sele","pers","MsWp","defo"], ["RcMq","ElMq","ClMq","RwMq"], ["FHSe"], ["objS","selt","floS"], ["rCrp"], ["pick","drop"],
+    ["inpa","heal","ptch","bleR","redE"], ["pxBr","brus","mixB","CoRe","mask"], ["clon","undo"], ["eras","BkEr","floE"], ["fill","floF"],
+    ["blur","shar","smud","medi","filt"], ["dodg","burn","spon","adju","tnbr"], [" pen","node"], [" art","fram"],
+    ["rect","elli","rrec"," tri","diam","trap","poly","star","dStr","sStr","arro","donu"," pie","segm","cres"," cog","clud","calR","calE","tear","hear","spir","QRCd"," cat"],
+    ["----"], ["view"], ["zoom"]]}
+ }
+}

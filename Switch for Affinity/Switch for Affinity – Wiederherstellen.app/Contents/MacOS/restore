@@ -1,0 +1,4 @@
+#!/bin/zsh
+L=de; [[ "$(defaults read -g AppleLanguages 2>/dev/null | sed -n 2p)" == *de* ]] || L=en
+L2=$(defaults read app.affinityswitch lang 2>/dev/null); [ "$L2" = 1 ] && L=en; [ "$L2" = 0 ] && L=de
+exec /bin/zsh "${0:A:h}/../Resources/core/restore.zsh" "$L"

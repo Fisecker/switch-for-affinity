@@ -1,0 +1,146 @@
+SWITCH FOR AFFINITY 1.0  (Mac)
+Affinity by Canva einrichten für Umsteiger von Adobe InDesign, Illustrator und Photoshop.
+
+Inoffizielles, kostenloses Hilfsprogramm. Nicht mit Canva/Serif oder Adobe verbunden.
+InDesign, Illustrator und Photoshop sind Marken von Adobe; Affinity ist eine Marke von Canva.
+Quellcode & Download: https://github.com/Fisecker/switch-for-affinity
+
+──────────────────────────────────────────
+ERSTER START – SICHERHEITSWARNUNG VON macOS (WICHTIG)
+Switch for Affinity ist (noch) nicht von Apple signiert und notarisiert. Dafür braucht man das
+kostenpflichtige Apple Developer Program (99 $ pro Jahr) – das kommt, sobald das Projekt es trägt.
+Seit macOS Sequoia 15.1 lassen sich solche Apps NICHT mehr per Rechtsklick → „Öffnen“ starten.
+So geht es trotzdem (nur beim allerersten Start nötig):
+1. „Switch for Affinity“ doppelklicken. macOS meldet, dass die App nicht geöffnet werden kann
+   → auf „Fertig“ (bzw. „OK“) klicken, NICHT „In den Papierkorb legen“.
+2. Apple-Menü  → Systemeinstellungen → Datenschutz & Sicherheit → ganz nach unten scrollen.
+3. Bei „Switch for Affinity wurde blockiert …“ auf „Trotzdem öffnen“ klicken und mit Passwort/Touch ID bestätigen.
+4. Nochmal doppelklicken → „Trotzdem öffnen“. Ab jetzt startet die App normal.
+Dasselbe gilt einmalig für „Switch for Affinity – Wiederherstellen“, falls du sie benutzt.
+Warum das sicher ist: Der komplette Quellcode ist offen auf GitHub einsehbar. Das Programm ändert nur
+Affinity-Einstellungen, sichert vorher alles und kann alles wiederherstellen. Es sendet keine Daten.
+
+──────────────────────────────────────────
+INSTALLIEREN
+1. Affinity by Canva muss installiert und mindestens einmal gestartet worden sein.
+   Offene Affinity-Dokumente speichern.
+2. „Switch for Affinity“ doppelklicken. Im Fenster einstellen:
+   ALLGEMEIN
+   • Sprache (Deutsch/English) · Tastatur (Deutsch/Englisch US)
+   • Oberfläche Dunkel/Hell · Werkzeugleiste 1 oder 2 Spalten · Schriftgröße Standard/Groß
+   • Symbole einfarbig/farbig · Kontextleiste oben angedockt/schwebend
+   • Farbprofile Europa (FOGRA39) / USA (SWOP) / nicht ändern
+   ÜBERNEHMEN VON
+   • InDesign / Illustrator / Photoshop mit Schieber ein/aus, darunter einzeln:
+     Tastenkürzel · Werkzeuge · Bedienfelder · Anpassen ⇧⌘E (InDesign-Anpassen-Befehle,
+     auf Wunsch auch im Vektor- und Pixel-Studio)
+   → „Übernehmen“. Die Auswahl wird gespeichert und beim nächsten Start angezeigt.
+   „Wiederherstellen…“ setzt alles auf den Stand vor Switch for Affinity zurück.
+   „♥ Unterstützen“ öffnet die Spendenseite – danke!
+3. Affinity startet automatisch neu – fertig.
+   Switch for Affinity kopiert sich dabei in den Programme-Ordner (auch im Launchpad zu finden).
+
+EINSTELLUNGEN SPÄTER ÄNDERN
+• In Affinity: Menü Affinity → Dienste → „Switch for Affinity – Einstellungen“
+• oder „Switch for Affinity“ im Programme-Ordner / Launchpad / Spotlight starten
+Das Fenster zeigt deine letzte Auswahl – ändern und „Übernehmen“.
+
+Zum Ändern, nach einem Affinity-Update oder einer Neuinstallation einfach nochmal starten.
+Das Programm liest dabei immer DEINE aktuellen Affinity-Dateien und passt nur die
+bekannten Einträge an. Neue Befehle künftiger Affinity-Versionen bleiben erhalten.
+
+ZURÜCKSETZEN
+Im Fenster „Wiederherstellen…“ klicken – oder „Switch for Affinity – Wiederherstellen“ doppelklicken.
+Ganz entfernen: danach „Switch for Affinity“ aus dem Programme-Ordner in den Papierkorb ziehen. Sicherungen liegen unter
+~/Library/Application Support/Switch for Affinity/Backups (Original: …/Original).
+
+──────────────────────────────────────────
+WAS WIRD GEÄNDERT (nur Affinity-eigene Einstellungen, das Programm selbst bleibt unverändert)
+• Tastenkürzel je Studio: Layout = InDesign, Vektor = Illustrator, Pixel = Photoshop
+• Werkzeugleiste links wie bei Adobe sortiert (1 oder 2 Spalten), zusätzliche Werkzeuge
+  (z. B. Buntstift, Schere/Messer, Messen, Formerstellung)
+• Bedienfelder nur rechts, wie Adobe gruppiert:
+  Layout:  Seiten/Ebenen · Kontur/Farbfelder/Farbe · Zeichen/Absatz/Textstile · Transformieren/Navigator/Protokoll
+  Vektor:  Farbe/Farbfelder/Pinsel · Kontur/Aussehen/Effekte/Stile · Ebenen · Transformieren · Zeichen
+  Pixel:   Farbe/Farbfelder · Anpassungen/Effekte/Stile/Pinsel · Ebenen/Kanäle · Protokoll/Navigator
+• Oberflächenstil Dunkel oder Hell, einfarbige Symbole, angedockte Kontextleiste (wie die Adobe-Steuerungsleiste)
+• Farbprofile wie Adobe Europa: CMYK Coated FOGRA39, RGB sRGB
+• InDesign „Objekt > Anpassen“ als Tastenkürzel (benötigt Affinity-MCP, wird automatisch eingeschaltet)
+
+──────────────────────────────────────────
+WICHTIGSTE TASTENKÜRZEL
+
+LAYOUT (InDesign)
+⌘D Platzieren · ⌘E Exportieren · ⌥⌘P Dokument einrichten · ⌘K Einstellungen · ⇧⌘P Seite hinzufügen
+⌘J Gehe zu Seite · ⇧⇞/⇧⇟ vorige/nächste Seite · ⇧⌘⇞/⇧⌘⇟ erste/letzte Seite
+⌘T Zeichen · ⌥⌘T Typografie · ⇧⌘T Tabulatoren · ⌥⌘I verborgene Zeichen · ⌘↩ Schnell anwenden
+⇧⌘L/C/R/J/F Ausrichtung links/Mitte/rechts/Blocksatz/alle · ⇧⌘B/I/U fett/kursiv/unterstrichen
+⇧⌘. / ⇧⌘, Schrift größer/kleiner (mit ⌥ präzise) · ⇧⌘K Versalien · ⇧⌘H Kapitälchen · ⌥⌘Q Kerning zurücksetzen · ⌥⇧⌘N Seitenzahl
+⇧⌘M Geviert · ⇧⌘N Halbgeviert · ⌥⇧⌘M Achtelgeviert · ⌥⌘X geschütztes Leerzeichen · ⌃⇧⌘/ durchgestrichen
+⌥⇧⌘R Absatzformat aus Auswahl · ⌘U intelligente Hilfslinien (Einrasten) · ⌥⌘Ü Hilfslinien sperren · ⌥⌘6 Kontextleiste · W Vorschaumodus
+⌘G / ⇧⌘G gruppieren/aufheben · ⌘L sperren · ⌥⌘L alles entsperren · ⌘3 ausblenden · ⌥⌘3 alles einblenden
+⌘8 / ⌥⇧⌘8 zusammengesetzter Pfad · ⇧⌘O in Pfade umwandeln · ⌥⌘W Textumfluss · ⌥⌘V in Rahmen einfügen
+⌥⌘Ä/Ö nächstes/voriges Objekt auswählen · ⌘Ä/Ö/⇧⌘Ä/⇧⌘Ö Anordnen
+⌘+ ⌘- Zoom · ⌘0 Seite einpassen · ⌥⌘0 Druckbogen · ⌘1 100 % · ⌘2 200 % · ⌘4 400 % · ⌘R Lineale · ⌥⌘´ Grundlinienraster
+⇧⌘E Inhalt zentrieren · ⌥⇧⌘E Inhalt proportional anpassen · ⌥⌘E Inhalt an Rahmen anpassen
+⌥⇧⌘C Rahmen proportional füllen · ⌥⌘C Rahmen an Inhalt anpassen
+Werkzeuge: V Auswahl · A Direktauswahl · T Text · P Zeichenstift · N Buntstift · M Rechteck · L Ellipse
+F Rechteckrahmen · C Schere · I Pipette · G Verlauf · H Hand · Z Zoom
+
+VEKTOR (Illustrator)
+⇧⌘P Platzieren · ⌥⌘E Exportieren · ⌘D Duplizieren/erneut transformieren · ⌘6 erneut auswählen
+⌘2 / ⌥⌘2 sperren/entsperren · ⌘3 / ⌥⌘3 / ⌥⇧⌘3 aus-/einblenden/andere ausblenden
+⌘J Zusammenfügen · ⌘7 / ⌥⌘7 Schnittmaske erstellen/lösen · ⌘8 / ⌥⇧⌘8 zusammengesetzter Pfad
+⇧⌘O in Pfade · ⌘Y Pfadansicht · ⌥⌘Y Pixelvorschau · ⇧⌘D Transparenzraster · ⌘L neue Ebene
+⌥⌘J Durchschnitt · ⇧⌘B/I/U fett/kursiv/unterstrichen · ⌘U intelligente Hilfslinien · ⌥⌘Ü Hilfslinien sperren · ⌘Ü/⌘´ Hilfslinien/Raster
+Werkzeuge: V · A · P · T · M Rechteck · L Ellipse · B Pinsel · N Buntstift · C Schere/Messer
+K Interaktiv malen · G Verlauf · I Pipette · S Formerstellung · W Angleichen · H · Z
+
+PIXEL (Photoshop)
+⌘L Tonwert · ⌘M Gradation · ⌘U Farbton/Sättigung · ⌘B Farbbalance · ⌥⇧⌘B Schwarzweiß · ⌘I Umkehren
+⇧⌘L Auto-Tonwert · ⌥⇧⌘L Auto-Kontrast · ⇧⌘B Auto-Farbe · ⌥⌘I Bildgröße · ⌥⌘C Arbeitsfläche
+⌘D Auswahl aufheben · ⇧⌘D erneut auswählen · ⇧⌘I Auswahl umkehren · ⌥⌘R Auswählen und maskieren
+⌘J Ebene duplizieren · ⇧⌘N neue Ebene · ⌘E auf eine Ebene reduzieren · ⇧⌘E auf Hintergrund reduzieren · ⌥⇧⌘E sichtbare stempeln
+⌘Ä/Ö/⇧⌘Ä/⇧⌘Ö Anordnen · ⌥Ä/⌥Ö nächste/vorige Ebene · ⌘Ü/⌘´ Hilfslinien/Raster · ⌥⌘Ü Hilfslinien sperren · ⌘F Suche
+⇧⌘U/K/H/J (Text) unterstrichen/Versalien/Kapitälchen/Blocksatz
+⌘G Gruppe · ⌥⌘G Schnittmaske · ⌘, Ebene ausblenden · ⌥⇧⌘F Ebenen suchen · ⇧⌘F Verblassen
+⌃⌘F letzter Filter · ⇧⌘A Camera Raw (Entwickeln) · ⇧⌘R Objektivkorrektur · ⇧⌘X Verflüssigen
+⌥⇧⌘W Exportieren · ⌥⌘W alle schließen · ⌥⇧⌘V einfügen in · ⇧⌘C auf eine Ebene reduziert kopieren
+Werkzeuge: V · M Auswahlrechteck · L Lasso · W Schnellauswahl · C Freistellen · I Pipette · J Reparatur
+B Pinsel/Farbe ersetzen · S Stempel · E Radiergummi · G Verlauf · O Abwedler · P Zeichenstift · T Text · U Formen · K Rahmen · H · Z
+
+──────────────────────────────────────────
+GRENZEN
+• Affinity ist nicht InDesign/Illustrator/Photoshop: Befehle ohne Gegenstück in Affinity haben kein Kürzel.
+• Einige Adobe-Kürzel belegt macOS selbst (z. B. ⌘H, ⌘M, ⌘⇥) – die bleiben beim System.
+• Die Anpassen-Befehle (⇧⌘E …) laufen über Affinitys Skript-Schnittstelle (MCP) und brauchen ~1 Sekunde.
+  Sie wirken auf Bilderrahmen. Im Vektor-/Pixel-Studio haben sie – wenn eingeschaltet – Vorrang vor
+  dort belegten Kürzeln (Illustrator ⌥⌘E Exportieren, Photoshop ⌥⌘C Arbeitsfläche, ⇧⌘E/⌥⇧⌘E reduzieren).
+  Die Anpassen-Kürzel gelten in ganz Affinity (macOS-Dienste lassen sich nicht pro Studio einschränken).
+• Tasten wie ; ' [ ] liegen auf der deutschen Tastatur auf Ü ´ Ö Ä (so zeigt es auch das Affinity-Menü).
+• Nur macOS. Windows-Version folgt.
+
+ENGLISH
+Switch for Affinity sets up Affinity by Canva for people coming from Adobe: InDesign shortcuts, tools and
+panels in the Layout studio, Illustrator in Vector, Photoshop in Pixel, plus InDesign-style fitting
+commands (⇧⌘E …). Double-click "Switch for Affinity" and choose in the window: language, keyboard
+(German/US), dark or light UI, 1 or 2 toolbar columns, font size, icon style, context toolbar,
+colour profiles, and per program shortcuts/tools/panels. Your choices are remembered; run it again
+to change them or after an Affinity update (it copies itself to Applications; inside Affinity use
+Affinity → Services → “Switch for Affinity – Einstellungen”). "Restore…" undoes everything (backups are kept in
+~/Library/Application Support/Switch for Affinity). First launch of a downloaded copy: System Settings →
+Privacy & Security → "Open Anyway". "♥ Support" opens the donation page – thank you!
+
+FIRST LAUNCH – macOS SECURITY WARNING
+The app is not yet signed/notarized by Apple (that requires the paid Apple Developer Program, $99/year).
+Since macOS Sequoia 15.1, right-click → "Open" no longer works for such apps. Instead:
+1. Double-click "Switch for Affinity", click "Done" in the warning (NOT "Move to Trash").
+2. Apple menu → System Settings → Privacy & Security → scroll down.
+3. Next to "Switch for Affinity was blocked…" click "Open Anyway" and confirm with password/Touch ID.
+4. Double-click again → "Open Anyway". From then on it opens normally.
+The full source code is public on GitHub. The app only changes Affinity settings, backs everything up
+first, can restore everything and sends no data.
+Unofficial; not affiliated with Canva, Serif or Adobe. Tested with Affinity 3.3 on macOS.
+Source & download: https://github.com/Fisecker/switch-for-affinity
+
+Enthaltene Fremdsoftware: fzstd (MIT-Lizenz, © 2020 Arjun Barrett).

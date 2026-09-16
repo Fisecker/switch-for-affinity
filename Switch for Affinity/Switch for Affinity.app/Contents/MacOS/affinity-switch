@@ -1,0 +1,245 @@
+#!/bin/zsh
+# Switch for Affinity – Installer (inoffiziell; nicht mit Canva, Serif oder Adobe verbunden)
+setopt NULL_GLOB
+R="${0:A:h}/../Resources"
+AFF="$HOME/Library/Application Support/Affinity"
+SW="$HOME/Library/Application Support/Switch for Affinity"
+# Umzug vom frueheren Namen "Affinity Switch" (Sicherungen/Original bleiben erhalten)
+OLDSW="$HOME/Library/Application Support/Affinity Switch"
+[ -d "$OLDSW" ] && [ ! -d "$SW" ] && mv "$OLDSW" "$SW"
+rm -rf "$HOME/Library/Services/Affinity Switch – "*.workflow 2>/dev/null
+for o in "/Applications/Affinity Switch.app" "$HOME/Applications/Affinity Switch.app"; do
+  grep -q app.affinityswitch "$o/Contents/Info.plist" 2>/dev/null && rm -rf "$o"
+done
+DOM=com.canva.affinity
+LOG="$SW/install.log"
+UILANG=de; [[ "$(defaults read -g AppleLanguages 2>/dev/null | sed -n 2p)" == *de* ]] || UILANG=en
+t(){ if [ "$UILANG" = de ]; then print -r -- "$1"; else print -r -- "$2"; fi; }
+dlg(){ osascript - "$1" "$2" "$(t Abbrechen Cancel)" <<'AS' 2>/dev/null
+on run argv
+  set b to {item 3 of argv, item 2 of argv}
+  if item 2 of argv is "OK" then set b to {"OK"}
+  display dialog (item 1 of argv) buttons b default button (item 2 of argv) with title "Switch for Affinity" with icon note
+end run
+AS
+}
+ask(){ [ -n "$AFFSWITCH_CHOICE" ] && return 0; dlg "$1" "$2" | grep -q "$2"; }
+info(){ [ -n "$AFFSWITCH_CHOICE" ] && { print -r -- "$1"; return 0; }; dlg "$1" "OK" >/dev/null; }
+
+APP=$(mdfind "kMDItemCFBundleIdentifier == '$DOM'" 2>/dev/null | head -1)
+[ -z "$APP" ] && [ -d /Applications/Affinity.app ] && APP=/Applications/Affinity.app
+if [ -z "$APP" ]; then info "$(t 'Affinity by Canva wurde nicht gefunden. Bitte zuerst Affinity installieren (affinity.studio) und einmal starten.' 'Affinity by Canva was not found. Please install Affinity (affinity.studio) and launch it once.')"; exit 1; fi
+VER=$(defaults read "$APP/Contents/Info.plist" CFBundleShortVersionString 2>/dev/null)
+DONATE=$(head -1 "$R/core/donate.txt" 2>/dev/null | tr -d '[:space:]'); [ -z "$DONATE" ] && DONATE=-
+
+# ---------- Einstellungsfenster ----------
+if [ -n "$AFFSWITCH_CHOICE" ]; then SEL="$AFFSWITCH_CHOICE"
+else
+  ERRF=$(mktemp -t affswitcherr); SEL=$(osascript -l JavaScript "$R/core/settings.js" "$VER" "$DONATE" 2>"$ERRF"); RC=$?
+  if [ -z "$SEL" ] && [ $RC -ne 0 ] && [ -s "$ERRF" ]; then info "$(t 'Das Einstellungsfenster konnte nicht geöffnet werden:' 'The settings window could not be opened:')
+$(head -c 400 "$ERRF")"; fi
+  rm -f "$ERRF"
+fi
+opt(){ print -r -- ";$SEL;" | grep -q ";$1;"; }
+[ -z "$SEL" ] && exit 0
+opt action=apply || opt action=restore || exit 0
+opt lang=en && UILANG=en; opt lang=de && UILANG=de
+
+if opt action=restore; then exec /bin/zsh "$R/core/restore.zsh" "$UILANG"; fi
+
+L=E9159E4D-661F-4138-A995-81A178A1824C; V=7C4CC2E1-D695-422B-AD3B-326C60971BE7; P=831AAB2C-659F-4906-A8B1-8BA4544DB274
+KEYS=(); TOOLS_ON=(); TOOLS_OFF=(); PANELS_ON=(); PANELS_OFF=(); NAMES=(); FIT=()
+for pair in "indesign:layout:${L}:InDesign" "illustrator:vector:${V}:Illustrator" "photoshop:pixel:${P}:Photoshop"; do
+  p=${pair%%:*}; rest=${pair#*:}; st=${rest%%:*}; rest=${rest#*:}; g=${rest%%:*}; nm=${rest#*:}
+  any=0
+  opt ${p}_keys=1 && { KEYS+=$st; any=1; }
+  if opt ${p}_tools=1; then TOOLS_ON+=$g; any=1; else TOOLS_OFF+=$g; fi
+  if opt ${p}_panels=1; then PANELS_ON+=$g; any=1; else PANELS_OFF+=$g; fi
+  opt ${p}_fit=1 && { FIT+=$st; any=1; }
+  [ $any = 1 ] && NAMES+=$nm
+done
+KB=de; opt kb=us && KB=us
+
+mkdir -p "$SW/Backups" "$AFF"
+exec 3>>"$LOG"; echo "=== $(date) Affinity $VER – $SEL" >&3
+
+# ---------- Affinity beenden ----------
+affrunning(){ ps -axo command= | grep -Eq '[A]ffinity[^/]*\.app/Contents/MacOS/Affinity( |$)' && return 0
+  [ "$(osascript -e 'application id "com.canva.affinity" is running' 2>/dev/null)" = true ]; }
+guard(){ affrunning || return 0; info "$(t 'Affinity wurde währenddessen wieder geöffnet. Abgebrochen – bitte Affinity beenden und Switch for Affinity erneut starten.' 'Affinity was opened again in the meantime. Aborted – please quit Affinity and run Switch for Affinity again.')"; exit 1; }
+if affrunning; then
+  osascript -e 'tell application id "com.canva.affinity" to quit' >/dev/null 2>&1
+  for i in {1..60}; do affrunning || break; sleep 0.5; done
+  while affrunning; do
+    [ -n "$AFFSWITCH_CHOICE" ] && { echo "Affinity laeuft noch" >&3; exit 1; }
+    ask "$(t 'Bitte Affinity jetzt beenden (Affinity > Beenden oder ⌘Q) und danach auf „Weiter“ klicken.' 'Please quit Affinity now (Affinity > Quit or ⌘Q), then click “Continue”.')" "$(t Weiter Continue)" || exit 0
+    for i in {1..20}; do affrunning || break; sleep 0.5; done
+  done
+fi
+sleep 1
+
+# ---------- Sicherung ----------
+STAMP=$(date +%Y-%m-%d_%H-%M-%S); BK="$SW/Backups/$STAMP"; mkdir -p "$BK" "$SW/Original"
+for f in shortcuts3.affshortcuts studios3.dat preferences.dat; do
+  [ -f "$AFF/$f" ] || continue
+  cp -p "$AFF/$f" "$BK/" || { info "$(t 'Sicherung fehlgeschlagen – es wurde nichts verändert.' 'Backup failed – nothing was changed.')"; exit 1; }
+done
+defaults export $DOM "$BK/$DOM.plist" 2>/dev/null
+echo "$VER" > "$BK/affinity-version.txt"
+# Original-Einstellungen nur beim allerersten Lauf sichern (sonst waeren es schon umgestellte)
+if [ ! -f "$SW/Original/$DOM.plist" ] && [ ! -f "$SW/Original/.prefs-saved" ]; then
+  defaults export $DOM "$SW/Original/$DOM.plist" 2>/dev/null; touch "$SW/Original/.prefs-saved"
+fi
+[ -f "$SW/Original/studios3.dat" ] || { [ -f "$AFF/studios3.dat" ] && cp -p "$AFF/studios3.dat" "$SW/Original/"; }
+# alte Sicherungen aufraeumen: die 10 neuesten und die aelteste bleiben
+old=( "$SW/Backups/"*(/On) ); (( ${#old} > 11 )) && rm -rf "${(@)old[11,-2]}"
+
+# ---------- 1) Tastenkuerzel ----------
+JS="$R/core/shortcuts.js"
+check(){ osascript -l JavaScript "$JS" --check "$1" 2>/dev/null; }
+ORIG="$SW/Original/shortcuts3.affshortcuts"; WRSHA="$SW/.shortcuts-written"
+CUR="$AFF/shortcuts3.affshortcuts"; CS=$(check "$CUR")
+sha(){ shasum -a 256 "$1" 2>/dev/null | cut -d' ' -f1; }
+OURS=0; [ -f "$CUR" ] && [ -f "$WRSHA" ] && [ "$(sha "$CUR")" = "$(cat "$WRSHA")" ] && OURS=1
+WARN=""; SKIPKEYS=""; BASE=""; UNSW=""
+case "$CS" in
+  clean|switched)
+    if [ "$CS" = clean ] && { [ ! -f "$ORIG" ] || { [ $OURS = 0 ] && [ "$(cat "$SW/Original/affinity-version.txt" 2>/dev/null)" != "$VER" ]; }; }; then
+      # unveraenderte Affinity-Datei (erster Lauf oder neue Affinity-Version) = neues Original
+      cp -p "$CUR" "$ORIG" && echo "$VER" > "$SW/Original/affinity-version.txt"; BASE="$ORIG"
+    else
+      if [ ! -f "$ORIG" ]; then
+        for c in "$HOME/Library/Application Support/AffinityWieAdobe/"*/shortcuts3.affshortcuts; do
+          [ "$(check "$c")" = clean ] && { cp -p "$c" "$ORIG"; break; }
+        done
+      fi
+      # aktuelle Datei als Basis (behaelt neue Befehle), Original-Kuerzel vorher zurueckholen
+      BASE="$CUR"; UNSW="$ORIG"; [ -f "$UNSW" ] || UNSW="$R/core/fallback-shortcuts.affshortcuts"
+    fi;;
+  missing) if [ -f "$ORIG" ]; then BASE="$ORIG"; else SKIPKEYS=1; fi;;
+  *) SKIPKEYS=1;;
+esac
+if [ -n "$SKIPKEYS" ]; then
+  echo "Kuerzel uebersprungen ($CS)" >&3
+  if [ ${#KEYS} -gt 0 ] || [ ${#FIT} -gt 0 ]; then WARN+="
+
+$(t 'Hinweis: Die Tastenkürzel-Datei von Affinity fehlt oder ist unbekannt – Tastenkürzel wurden nicht verändert. Bitte Affinity einmal öffnen und schließen, dann erneut ausführen.' 'Note: Affinity’s shortcuts file is missing or unknown – shortcuts were not changed. Please open and quit Affinity once, then run again.')"; fi
+else
+  TMP=$(mktemp -t affswitch)
+  REPORT=$(osascript -l JavaScript "$JS" "$BASE" "$R/core/mapping.json" "$TMP" "${(j:,:)KEYS}" "$KB" "${(j:,:)FIT}" "$UNSW" 2>&1)
+  echo "Basis: $BASE | Unswitch: $UNSW | Kuerzel: $REPORT" >&3
+  RES=$(check "$TMP")
+  if [ "$RES" = invalid ] || [ "$RES" = missing ] || { [ ${#KEYS} -gt 0 ] && [ "$RES" != switched ]; }; then
+    rm -f "$TMP"
+    info "$(t 'Die Tastenkürzel konnten nicht erzeugt werden. Es wurde nichts verändert.' 'The shortcuts could not be generated. Nothing was changed.')
+
+$REPORT"
+    exit 1
+  fi
+  [[ "$REPORT" == *'"warnings":[]'* ]] || WARN+="
+
+$(t 'Hinweis: Nicht alle Studios wurden in der Tastenkürzel-Datei gefunden (neuere Affinity-Version?).' 'Note: Not all studios were found in the shortcuts file (newer Affinity version?).')"
+  guard
+  cp "$TMP" "$CUR" || { rm -f "$TMP"; info "$(t 'Die Tastenkürzel konnten nicht geschrieben werden.' 'The shortcuts could not be written.')"; exit 1; }
+  rm -f "$TMP"; sha "$CUR" > "$WRSHA"
+fi
+
+# ---------- 2) Werkzeugleisten ----------
+if [ -f "$AFF/studios3.dat" ]; then
+  TMPS=$(mktemp -t affswitch); CFG=$(mktemp -t affswitchcfg)
+  osascript -l JavaScript - "$R/core/toolbars.json" "$CFG" "${(j:,:)TOOLS_ON}" "${(j:,:)TOOLS_OFF}" >/dev/null 2>&1 <<'JS'
+ObjC.import('Foundation');
+function run(a){ var c=JSON.parse($.NSString.stringWithContentsOfFileEncodingError(a[0],4,null).js), on=a[2]?a[2].split(','):[], s={};
+  on.forEach(function(g){ if(c.studios[g]) s[g]=c.studios[g]; }); c.studios=s; c.reset=a[3]?a[3].split(','):[];
+  $(JSON.stringify(c)).writeToFileAtomicallyEncodingError(a[1],true,4,null); }
+JS
+  SREP=$(osascript -l JavaScript "$R/core/studios.js" "$AFF/studios3.dat" "$CFG" "$TMPS" 2>&1)
+  echo "Werkzeuge: $SREP" >&3
+  if [[ "$SREP" == '{"changed":["'* ]]; then guard; cp "$TMPS" "$AFF/studios3.dat"
+  elif [ ${#TOOLS_ON} -gt 0 ]; then WARN+="
+
+$(t 'Hinweis: Die Werkzeugleisten konnten bei dieser Affinity-Version nicht angepasst werden (alles andere schon).' 'Note: The toolbars could not be changed in this Affinity version (everything else was applied).')"; fi
+  rm -f "$TMPS" "$CFG"
+elif [ ${#TOOLS_ON} -gt 0 ]; then WARN+="
+
+$(t 'Hinweis: Die Werkzeugleisten konnten noch nicht angepasst werden, weil Affinity noch nie gestartet wurde. Bitte Affinity einmal öffnen und schließen, dann Switch for Affinity erneut ausführen.' 'Note: The toolbars could not be changed yet because Affinity has never been launched. Please open and quit Affinity once, then run Switch for Affinity again.')"
+fi
+
+# ---------- 3) Allgemeine Einstellungen (nur eingebaute Affinity-Einstellungen) ----------
+guard
+if opt ui=light; then defaults write $DOM com.canva.affinity.scheme.uimode -int 0; else defaults write $DOM com.canva.affinity.scheme.uimode -int 1; fi
+if opt cols=1; then defaults write $DOM Tab-ToolUIPanel-NumberOfColumns -int 1; else defaults write $DOM Tab-ToolUIPanel-NumberOfColumns -int 2; fi
+if opt icons=color; then defaults write $DOM MonochromaticIconography -bool false; else defaults write $DOM MonochromaticIconography -bool true; fi
+if opt ctx=float; then defaults write $DOM DockContextToolbar -bool false; else defaults write $DOM DockContextToolbar -bool true; fi
+[ -f "$R/core/fontsize.sh" ] && source "$R/core/fontsize.sh"
+if opt cmyk=eu; then
+  defaults write $DOM CMYKGlobalProfile -string "Coated FOGRA39 (ISO 12647-2:2004)"; defaults write $DOM RGBGlobalProfile -string "sRGB IEC61966-2.1"
+elif opt cmyk=us; then
+  defaults write $DOM CMYKGlobalProfile -string "U.S. Web Coated (SWOP) v2"; defaults write $DOM RGBGlobalProfile -string "sRGB IEC61966-2.1"
+fi
+defaults write $DOM ShowRulers -bool true
+
+# ---------- 4) Bedienfelder ----------
+for G in $PANELS_OFF; do
+  defaults delete $DOM "com.canva.affinity.Studio.Data.1.$G" 2>/dev/null
+  defaults delete $DOM "com.canva.affinity.Studio.Data.1.$G.com.canva.affinity.hide.west" 2>/dev/null
+  defaults delete $DOM "com.canva.affinity.Studio.Data.1.$G.com.canva.affinity.hide.east" 2>/dev/null
+  defaults delete $DOM "$G.east.studio.width" 2>/dev/null
+done
+for G in $PANELS_ON; do
+  f="$R/core/layouts/$G.hex"; [ -f "$f" ] || continue
+  defaults write $DOM "com.canva.affinity.Studio.Data.1.$G" -data "$(cat "$f")"
+  defaults write $DOM "com.canva.affinity.Studio.Data.1.$G.com.canva.affinity.hide.east" -bool false
+  defaults write $DOM "com.canva.affinity.Studio.Data.1.$G.com.canva.affinity.hide.west" -bool true
+  defaults write $DOM "$G.east.studio.width" -float 264
+done
+
+# ---------- 5) Anpassen-Befehle (⇧⌘E …) fuer die gewaehlten Studios ----------
+rm -rf "$HOME/Library/Services/Affinity – "*.workflow
+if [ ${#FIT} -gt 0 ]; then
+  defaults write $DOM EnableMCPServer -bool true
+  defaults write $DOM com.canva.affinity.scripting.enabled -bool true
+  mkdir -p "$SW/anpassen" "$HOME/Library/Services"
+  cp "$R/anpassen/"* "$SW/anpassen/"; chmod +x "$SW/anpassen/"*.zsh
+  for w in "$R/Services/"*.workflow; do rm -rf "$HOME/Library/Services/${w:t}"; cp -R "$w" "$HOME/Library/Services/"; done
+  xattr -dr com.apple.quarantine "$SW/anpassen" "$HOME/Library/Services/Switch for Affinity – "*.workflow 2>/dev/null
+  osascript -l JavaScript "$R/core/services.js" set >/dev/null 2>&1
+else
+  rm -rf "$HOME/Library/Services/Switch for Affinity – "*.workflow "$SW/anpassen"
+  osascript -l JavaScript "$R/core/services.js" remove >/dev/null 2>&1
+  # Skript-Schnittstelle (MCP) wieder so wie vor der ersten Installation
+  for k in EnableMCPServer com.canva.affinity.scripting.enabled; do
+    v=$(/usr/libexec/PlistBuddy -c "Print :$k" "$SW/Original/$DOM.plist" 2>/dev/null)
+    case "$v" in true|false) defaults write $DOM $k -bool $v;; *) defaults delete $DOM $k 2>/dev/null;; esac
+  done
+fi
+/System/Library/CoreServices/pbs -flush >/dev/null 2>&1
+/System/Library/CoreServices/pbs -update >/dev/null 2>&1
+
+# ---------- 6) Programm in den Programme-Ordner + Menue-Eintrag in Affinity ----------
+SELF="${0:A:h:h:h}"
+DEST=/Applications; [ -w /Applications ] || { DEST="$HOME/Applications"; mkdir -p "$DEST"; }
+case "$SELF" in
+  "/Applications/Switch for Affinity.app"|"$HOME/Applications/Switch for Affinity.app") ;;
+  *) rm -rf "$DEST/Switch for Affinity.app"; ditto "$SELF" "$DEST/Switch for Affinity.app" && echo "kopiert nach $DEST" >&3
+     /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST/Switch for Affinity.app" >/dev/null 2>&1;;
+esac
+mkdir -p "$HOME/Library/Services"
+for w in "$R/ServicesAlways/"*.workflow; do rm -rf "$HOME/Library/Services/${w:t}"; cp -R "$w" "$HOME/Library/Services/"; done
+xattr -dr com.apple.quarantine "$HOME/Library/Services/Switch for Affinity – Einstellungen.workflow" 2>/dev/null
+[ -d "$DEST/Switch for Affinity.app" ] && xattr -dr com.apple.quarantine "$DEST/Switch for Affinity.app" 2>/dev/null
+osascript -l JavaScript "$R/core/services.js" settings >/dev/null 2>&1
+/System/Library/CoreServices/pbs -flush >/dev/null 2>&1; /System/Library/CoreServices/pbs -update >/dev/null 2>&1
+
+echo "fertig" >&3
+open -b $DOM
+[ ${#NAMES} -eq 0 ] && NAMES=("$(t 'nichts (Affinity-Standard)' 'nothing (Affinity defaults)')")
+info "$(t 'Fertig!' 'Done!')
+
+$(t 'Übernommen von' 'Adopted from'): ${(j:, :)NAMES}$WARN
+
+$(t 'Einstellungen später ändern oder zurücksetzen:
+• In Affinity: Menü Affinity → Dienste → „Switch for Affinity – Einstellungen“
+• oder „Switch for Affinity“ im Programme-Ordner / Launchpad starten' 'To change or restore later:
+• In Affinity: menu Affinity → Services → “Switch for Affinity – Einstellungen”
+• or launch “Switch for Affinity” from Applications / Launchpad')"
